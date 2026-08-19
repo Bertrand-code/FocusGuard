@@ -1,0 +1,22 @@
+{
+  "manifest_version": 3,
+  "name": "FocusGuard",
+  "version": "0.1.0",
+  "description": "Visible, local-first enforcement for policies you explicitly activate.",
+  "minimum_chrome_version": "120",
+  "permissions": ["alarms", "storage", "tabs", "webNavigation"],
+  "host_permissions": ["http://*/*", "https://*/*"],
+  "background": {
+    "service_worker": "background.js",
+    "type": "module"
+  },
+  "action": {
+    "default_title": "FocusGuard status and enrollment",
+    "default_popup": "popup.html"
+  },
+  "options_page": "popup.html",
+  "incognito": "spanning",
+  "content_security_policy": {
+    "extension_pages": "default-src 'self'; script-src 'self'; style-src 'self'; object-src 'none'; base-uri 'none'; frame-ancestors 'none'; connect-src http://localhost:8000 http://127.0.0.1:8000 https:"
+  }
+}

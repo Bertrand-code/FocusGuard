@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Blocked by FocusGuard</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body class="block-page">
+    <main class="block-card">
+      <div class="shield" aria-hidden="true">✓</div>
+      <p class="eyebrow">FocusGuard is active</p>
+      <h1 id="decision-title">This site is blocked</h1>
+      <p id="reason">An active policy applies right now.</p>
+      <dl>
+        <div><dt>Site</dt><dd id="domain">—</dd></div>
+        <div><dt>Policy</dt><dd id="policy">—</dd></div>
+        <div><dt>Until</dt><dd id="expiration">Policy changes</dd></div>
+      </dl>
+      <form id="override-form" hidden>
+        <label id="reason-label">Why do you need access? <textarea id="override-reason" maxlength="240"></textarea></label>
+        <label class="confirmation"><input id="override-confirm" type="checkbox" /> I want to use the permitted override.</label>
+        <button type="submit">Use override</button>
+      </form>
+      <p id="override-unavailable">This policy does not permit an immediate override.</p>
+      <p id="error" class="error" role="alert" hidden></p>
+      <button id="back" class="secondary" type="button">Go back</button>
+    </main>
+    <script type="module" src="block.js"></script>
+  </body>
+</html>

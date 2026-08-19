@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>FocusGuard</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body class="popup">
+    <main>
+      <div class="brand-row">
+        <span class="status-dot" id="status-dot" aria-hidden="true"></span>
+        <div>
+          <h1>FocusGuard</h1>
+          <p id="status" role="status">Checking status…</p>
+        </div>
+      </div>
+
+      <section id="health-panel" class="panel" hidden>
+        <h2>Enforcement health</h2>
+        <dl>
+          <div><dt>Policy</dt><dd id="policy-version">—</dd></div>
+          <div><dt>Valid until</dt><dd id="valid-until">—</dd></div>
+          <div><dt>Last sync</dt><dd id="last-sync">—</dd></div>
+          <div><dt>Incognito</dt><dd id="incognito">—</dd></div>
+        </dl>
+        <button id="sync" type="button">Sync now</button>
+      </section>
+
+      <form id="enroll-form" class="panel" hidden>
+        <h2>Enroll this Chrome profile</h2>
+        <p>Enrollment is visible in Chrome and applies only to this profile.</p>
+        <label>API address <input id="api-base" type="url" value="http://localhost:8000" required /></label>
+        <label>Enrollment code <input id="enrollment-code" autocomplete="one-time-code" required /></label>
+        <label>Profile name <input id="device-name" value="My Chrome" maxlength="120" required /></label>
+        <button type="submit">Enroll profile</button>
+      </form>
+
+      <p id="error" class="error" role="alert" hidden></p>
+      <p class="privacy">FocusGuard does not send your full browsing history. Only optional, policy-relevant events can be uploaded.</p>
+    </main>
+    <script type="module" src="popup.js"></script>
+  </body>
+</html>

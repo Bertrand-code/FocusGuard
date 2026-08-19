@@ -1,0 +1,56 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: focusguard
+      POSTGRES_USER: focusguard_admin
+      POSTGRES_PASSWORD: local-development-only
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U focusguard_admin -d focusguard"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+    volumes:
+      - focusguard-postgres:/var/lib/postgresql/data
+      - ./apps/api/migrations:/docker-entrypoint-initdb.d:ro
+      - ./tests/security:/security-tests:ro
+
+  redis:
+    image: redis:7-alpine
+    command: ["redis-server", "--save", "", "--appendonly", "no"]
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  api:
+    build:
+      context: ./apps/api
+    environment:
+      FOCUSGUARD_ENVIRONMENT: development
+      FOCUSGUARD_STORE: memory
+      FOCUSGUARD_REDIS_URL: redis://redis:6379/0
+      FOCUSGUARD_SESSION_COOKIE_SECURE: "false"
+      FOCUSGUARD_PASSWORD_PEPPER: local-development-pepper-not-for-production
+    ports:
+      - "8000:8000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+  web:
+    build:
+      context: .
+      dockerfile: apps/web/Dockerfile
+    environment:
+      NEXT_PUBLIC_FOCUSGUARD_API_ORIGIN: http://localhost:8000
+    ports:
+      - "3000:3000"
+    depends_on:
+      - api
+
+volumes:
+  focusguard-postgres:

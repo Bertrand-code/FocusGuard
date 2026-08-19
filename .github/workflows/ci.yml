@@ -1,0 +1,59 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  typescript:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm run ci
+      - name: Upload bypass-resistance report
+        uses: actions/upload-artifact@v4
+        with:
+          name: bypass-resistance-report
+          path: tests/bypass-lab/bypass-report.json
+
+  api:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_DB: focusguard_test
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres -d focusguard_test"
+          --health-interval 5s
+          --health-timeout 3s
+          --health-retries 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+      - run: pip install -e './apps/api[dev]'
+      - run: ruff check apps/api
+      - run: mypy apps/api/src
+      - run: bandit -c apps/api/pyproject.toml -r apps/api/src
+      - run: pytest apps/api --cov=focusguard_api --cov-report=term-missing
+      - name: Apply schema and prove tenant isolation
+        env:
+          PGPASSWORD: postgres
+        run: |
+          psql -h localhost -U postgres -d focusguard_test -f apps/api/migrations/0001_initial.sql
+          psql -h localhost -U postgres -d focusguard_test -f tests/security/rls_isolation.sql
